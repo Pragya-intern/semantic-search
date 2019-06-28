@@ -1,8 +1,9 @@
 ## Customization
 
-For demo refer: `scripts/search_pic.sh`
+* For demo refer: `scripts/search_pic.sh`
+* For CBIR report: `[reports/README.md](reports/README.md)`
+* vector length is: vgg: 4096, resnet, maskrcnnlite: 2048 (explain)
 
-For CBIR report: `[reports/README.md](reports/README.md)`
 
 **Changes / Contributions:**
 * `demo2.py` - minor changes based on `demo.py`
