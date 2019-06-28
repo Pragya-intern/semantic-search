@@ -29,7 +29,7 @@ For CBIR report: `[reports/README.md](reports/README.md)`
   }
   ```
   * `vector_search/maskrcnnlite.py` - integrating/loading mask_rcnn model file
-
+  * `mrcnnload.py` - for quick testing of maskrcnn model loding
 
 **TODO**
 * Put the custom dataset reference, on how to download
