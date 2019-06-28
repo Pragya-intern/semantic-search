@@ -2,32 +2,118 @@ import logging
 import os
 import json
 import time
+import sys
 
 import h5py
 import numpy as np
-
+from keras.models import Input
 from annoy import AnnoyIndex
 from keras import optimizers
 from keras.layers import Dense, BatchNormalization, Activation, Dropout
 from keras.losses import cosine_proximity
 from keras.preprocessing import image
 from keras.models import Model
+#from keras.applications.vgg16 import VGG16
+from keras.layers import Input, Add, Dense, Activation, ZeroPadding2D, BatchNormalization, Flatten, Conv2D, AveragePooling2D, MaxPooling2D, GlobalMaxPooling2D
+
+from keras.applications.resnet50 import ResNet50, preprocess_input
+#from keras.applications.vgg16 import preprocess_input
+from keras.layers import Flatten
 from keras.applications.vgg16 import VGG16
 from keras.applications.vgg16 import preprocess_input
 
+ROOT_DIR = os.path.abspath("../")
+sys.path.append(ROOT_DIR)
+
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+def load_mrcnn_model():
+    MRCNN_ROOT = os.path.abspath("/home/intern/Documents/ai-ml-dl/external/MRCNN/Mask_RCNN")
+
+    sys.path.append(MRCNN_ROOT)
+    sys.path.append(os.path.join(MRCNN_ROOT, "samples/coco/"))  # To find local version
+
+    import mrcnn.model as modellib
+    import coco
+
+    MODEL_DIR = os.path.join(MRCNN_ROOT, "logs")
+    MRCNN_MODEL_PATH = os.path.join(MRCNN_ROOT, "mask_rcnn_coco.h5")
+
+    class InferenceConfig(coco.CocoConfig):
+        # Set batch size to 1 since we'll be running inference on
+        # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
+        GPU_COUNT = 1
+        IMAGES_PER_GPU = 1
+
+    config = InferenceConfig()
+    config.display()
+
+    # Create model object in inference mode.
+    model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
+
+    # Load weights trained on MS-COCO
+    model.load_weights(MRCNN_MODEL_PATH, by_name=True)
+    return model
+
+
+def load_mrcnnlite_model():
+
+    import vector_search.maskrcnnlite as modellib
+
+    MRCNN_ROOT = os.path.abspath("/home/intern/Documents/ai-ml-dl/external/MRCNN/Mask_RCNN")
+    MODEL_DIR = os.path.join(MRCNN_ROOT, "logs")
+    MRCNN_MODEL_PATH = os.path.join(MRCNN_ROOT, "mask_rcnn_coco.h5")
+    print("MRCNN_MODEL_PATH: {}".format(MRCNN_MODEL_PATH))
+    
+    ## TODO: check if MRCNN_MODEL_PATH exists or not
+
+    model = modellib.MaskRCNNLite(mode="inference", model_dir=MODEL_DIR)
+    model.load_weights(MRCNN_MODEL_PATH, by_name=True)
+
+    return model
 
 
 def load_headless_pretrained_model():
     """
     Loads the pretrained version of VGG with the last layer cut off
     :return: pre-trained headless VGG16 Keras Model
+
+    TODO:
+    if else condition: to select VGG/Resnet/maskrcnn based on the input
     """
     print ("Loading headless pretrained model...")
+
+
+
+    '''
+    pretrained_resnet50 = ResNet50(weights='imagenet', include_top=False)
+    print(pretrained_resnet50.summary())
+    x=pretrained_resnet50.output
+    x = Flatten()(x)
+    predictions = Dense(n_classes, activation='softmax', name='fc1000')(x)
+    model = Model(input=pretrainied_resnet50.input, output=predictions)
+
+                  #outputs=pretrained_resnet50.get_layer('flatten').output)
+    print(model.summary())
+    
     pretrained_vgg16 = VGG16(weights='imagenet', include_top=True)
     model = Model(inputs=pretrained_vgg16.input,
-                  outputs=pretrained_vgg16.get_layer('fc2').output)
+                 outputs=pretrained_vgg16.get_layer('fc2').output)
+    '''
+
+     resn_model = ResNet50(weights='imagenet',include_top=True)
+    #x=resn_model.layers[-2].output
+    # # x=Flatten()(x)
+     model=Model(inputs=resn_model.inputs, outputs=resn_model.layers[-2].output)
+
+
+    
+    # model = load_mrcnn_model()
+   # model = load_mrcnnlite_model()
+
     return model
 
 
@@ -91,7 +177,7 @@ def load_features(features_filename, mapping_filename):
     return images_features, file_index
 
 
-def index_features(features, n_trees=1000, dims=4096, is_dict=False):
+def index_features(features, n_trees=1000, dims=2048, is_dict=False):
     """
     Use Annoy to index our features to be able to query them rapidly
     :param features: array of item features

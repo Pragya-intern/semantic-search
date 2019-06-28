@@ -4,6 +4,10 @@ from argparse import ArgumentParser
 from utils import load_paired_img_wrd
 from vector_search import vector_search
 
+## To increase/set the GPU utilization
+import tensorflow as tf
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
+sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) 
 
 def build_parser():
     par = ArgumentParser()
@@ -58,7 +62,12 @@ def index_images(folder, features_path, mapping_path, model, features_from_new_m
         folder=folder, 
         word_vectors=word_vectors,
         use_word_vectors=features_from_new_model_boolean)
+    
+    print("index_images:: paths: {}".format(paths))
+
     images_features, file_index = vector_search.generate_features(paths, model)
+    print ("Important")
+    print (file_index)
     vector_search.save_features(features_path, images_features, mapping_path, file_index)
     return images_features, file_index
 
@@ -83,8 +92,9 @@ def generate_features(index_folder, features_path, file_mapping, loaded_model, f
 def build_index_and_search_through_it(images_features, file_index):
     # Decide whether to do only image search or hybrid search
     if not features_from_new_model_boolean:
+                
         # This is pure image search
-        image_index = vector_search.index_features(images_features, dims=4096)
+        image_index = vector_search.index_features(images_features, dims=2048)
         search_key = get_index(input_image, file_index)
         results = vector_search.search_index_by_key(search_key, image_index, file_index)
         print(results)
@@ -126,9 +136,9 @@ if __name__ == "__main__":
     if model_path:
         loaded_model = load_model(model_path)
     else:
+        ## TODO: pass config parameter to select type of model: VGG/resnet/maskrcnn
         loaded_model = vector_search.load_headless_pretrained_model()
-
-    # Decide whether to index the images (if you already have them) or load images to disk
+# Decide whether to index the images (if you already have them) or load images to disk
     if index_boolean:
         generate_features(index_folder, features_path, file_mapping, loaded_model, features_from_new_model_boolean, glove_path)
     else:

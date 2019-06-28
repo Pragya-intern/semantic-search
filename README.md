@@ -1,3 +1,43 @@
+## Customization
+
+For demo refer: `scripts/search_pic.sh`
+
+For CBIR report: `[reports/README.md](reports/README.md)`
+
+**Changes / Contributions:**
+* `demo2.py` - minor changes based on `demo.py`
+* `scripts/` added
+* `reports/` added
+* `search.py` added
+  ```python
+  ## To increase/set the GPU utilization
+  import tensorflow as tf
+  gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
+  sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) 
+  ```
+* For MASK_RCNN integrations
+  * core mrcnn code, credits:
+  ```
+  @misc{matterport_maskrcnn_2017,
+    title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
+    author={Waleed Abdulla},
+    year={2017},
+    publisher={Github},
+    journal={GitHub repository},
+    howpublished={\url{https://github.com/matterport/Mask_RCNN}},
+  }
+  ```
+  * `vector_search/maskrcnnlite.py` - integrating/loading mask_rcnn model file
+
+
+**TODO**
+* Put the custom dataset reference, on how to download
+  - if possible give the script to download
+  - instructions on where to store this dataset for demo
+* `search.py`
+  * `TODO: pass config parameter to select type of model: VGG/resnet/maskrcnn`
+
+---
 # Semantic Search
 ![Preview](https://github.com/hundredblocks/semantic-search/blob/master/assets/image_search_cover.jpeg)
 
