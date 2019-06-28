@@ -104,15 +104,13 @@ def load_headless_pretrained_model():
                  outputs=pretrained_vgg16.get_layer('fc2').output)
     '''
 
-     resn_model = ResNet50(weights='imagenet',include_top=True)
-    #x=resn_model.layers[-2].output
-    # # x=Flatten()(x)
-     model=Model(inputs=resn_model.inputs, outputs=resn_model.layers[-2].output)
-
-
+    resn_model = ResNet50(weights='imagenet',include_top=True)
+    # x=resn_model.layers[-2].output
+    # x=Flatten()(x)
+    model=Model(inputs=resn_model.inputs, outputs=resn_model.layers[-2].output)
     
     # model = load_mrcnn_model()
-   # model = load_mrcnnlite_model()
+    # model = load_mrcnnlite_model()
 
     return model
 
