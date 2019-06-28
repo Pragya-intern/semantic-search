@@ -9,6 +9,7 @@ For CBIR report: `[reports/README.md](reports/README.md)`
 * `scripts/` added
 * `reports/` added
 * `search.py` added
+* `vector_search/vector_search.py` - key customization on model loading
   ```python
   ## To increase/set the GPU utilization
   import tensorflow as tf
@@ -36,6 +37,8 @@ For CBIR report: `[reports/README.md](reports/README.md)`
   - instructions on where to store this dataset for demo
 * `search.py`
   * `TODO: pass config parameter to select type of model: VGG/resnet/maskrcnn`
+* `vector_search/vector_search.py`
+  * make different model loding as config option
 
 ---
 # Semantic Search
