@@ -72,7 +72,7 @@ class MaskRCNNLite():
         x = self.identity_block(x, 3, [512, 512, 2048], stage=5, block='c', train_bn=train_bn)
 
 
-        x = AveragePooling2D(pool_size=(2, 2), name='avg_pool')(x)
+        #x = AveragePooling2D(pool_size=(2, 2), name='avg_pool')(x)
 
         # output layer
         # x = Flatten()(x)
