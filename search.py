@@ -9,6 +9,9 @@ import tensorflow as tf
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
 sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) 
 
+## TODO: only for debugging
+global_features = None
+
 def build_parser():
     par = ArgumentParser()
     par.add_argument('--features_path', type=str,
@@ -143,4 +146,7 @@ if __name__ == "__main__":
         generate_features(index_folder, features_path, file_mapping, loaded_model, features_from_new_model_boolean, glove_path)
     else:
         images_features, file_index = vector_search.load_features(features_path, file_mapping)
+
+        ## TODO: only for debugging
+        global_features = images_features
         build_index_and_search_through_it(images_features, file_index)

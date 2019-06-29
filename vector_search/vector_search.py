@@ -55,7 +55,7 @@ def load_mrcnn_model():
     model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 
     # Load weights trained on MS-COCO
-    model.load_weights(MRCNN_MODEL_PATH, by_name=False)
+    model.load_weights(MRCNN_MODEL_PATH, by_name=True)
     return model
 
 
@@ -71,7 +71,7 @@ def load_mrcnnlite_model():
     ## TODO: check if MRCNN_MODEL_PATH exists or not
 
     model = modellib.MaskRCNNLite(mode="inference", model_dir=MODEL_DIR)
-    model.load_weights(MRCNN_MODEL_PATH, by_name=False)
+    model.load_weights(MRCNN_MODEL_PATH, by_name=True)
     
 
 
@@ -85,10 +85,12 @@ def load_headless_pretrained_model():
     :return: pre-trained headless VGG16 Keras Model
 
     """
+    
     print ("To load headless pretrained model...")
     print ("Input integers for which model to load. 1-Pretrained VGG16, 2-Pretrained ResNet50, 3-Resnet50")
-    n1=input("Enter numbers 1/2/3")
-    n=int(n1)
+    n1 = input("Enter numbers 1/2/3")
+    n = int(n1)
+    
     if n==1:
         pretrained_vgg16 = VGG16(weights='imagenet', include_top=True)
         model = Model(inputs=pretrained_vgg16.input,
@@ -96,7 +98,7 @@ def load_headless_pretrained_model():
 
     if n==2:
         Pretrained_resn_model = ResNet50(weights='imagenet',include_top=True)
-        model=Model(inputs=Pretrained_resn_model.inputs, outputs=resn_model.layers[-2].output)
+        model = Model(inputs=Pretrained_resn_model.inputs, outputs=Pretrained_resn_model.layers[-2].output)
 
     if n==3:
         model = load_mrcnnlite_model()
@@ -128,6 +130,8 @@ def generate_features(image_paths, model):
     inputs = preprocess_input(images)
     logger.info("Images preprocessed")
     images_features = model.predict(inputs)
+    # print("images_features: {}".format(images_features))
+    print("len(images_features): {}".format(len(images_features)))
     end = time.time()
     logger.info("Inference done, %s Generation time" % (end - start))
     return images_features, file_mapping
@@ -173,11 +177,21 @@ def index_features(features, n_trees=1000, dims=2048, is_dict=False):
     :return: an Annoy tree of indexed features
     """
     print ("Indexing features...")
+    print ("len(features): {}".format(len(features)))
+    # print ("features[0]: {}".format(features[0]))
+
     feature_index = AnnoyIndex(dims, metric='angular')
     for i, row in enumerate(features):
-        vec = row
+        
+        if features.ndim == 4:
+            vec = features[0][0][row]
+        else:
+            vec = features[row]
+        
+        ## TODO:
         if is_dict:
             vec = features[row]
+        
         feature_index.add_item(i, vec)
     feature_index.build(n_trees)
     return feature_index
