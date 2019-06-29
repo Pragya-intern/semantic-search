@@ -21,7 +21,7 @@ echo "dataset_path: $dataset_path"
 ## resnet, maskrcnnlite: 2048
 
 python $basepath/search.py \
-  --input_image $dataset_path/llama/image_0046.jpg \
+  --input_image $dataset_path/cup/image_0044.jpg \
   --features_path feat-${modelname} \
   --file_mapping index-${modelname} \
   --index_boolean False \
