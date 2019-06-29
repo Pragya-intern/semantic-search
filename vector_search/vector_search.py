@@ -55,7 +55,7 @@ def load_mrcnn_model():
     model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 
     # Load weights trained on MS-COCO
-    model.load_weights(MRCNN_MODEL_PATH, by_name=True)
+    model.load_weights(MRCNN_MODEL_PATH, by_name=False)
     return model
 
 
@@ -71,7 +71,10 @@ def load_mrcnnlite_model():
     ## TODO: check if MRCNN_MODEL_PATH exists or not
 
     model = modellib.MaskRCNNLite(mode="inference", model_dir=MODEL_DIR)
-    model.load_weights(MRCNN_MODEL_PATH, by_name=True)
+    model.load_weights(MRCNN_MODEL_PATH, by_name=False)
+    
+
+
 
     return model
 
@@ -81,36 +84,22 @@ def load_headless_pretrained_model():
     Loads the pretrained version of VGG with the last layer cut off
     :return: pre-trained headless VGG16 Keras Model
 
-    TODO:
-    if else condition: to select VGG/Resnet/maskrcnn based on the input
     """
-    print ("Loading headless pretrained model...")
-
-
-
-    '''
-    pretrained_resnet50 = ResNet50(weights='imagenet', include_top=False)
-    print(pretrained_resnet50.summary())
-    x=pretrained_resnet50.output
-    x = Flatten()(x)
-    predictions = Dense(n_classes, activation='softmax', name='fc1000')(x)
-    model = Model(input=pretrainied_resnet50.input, output=predictions)
-
-                  #outputs=pretrained_resnet50.get_layer('flatten').output)
-    print(model.summary())
-    
-    pretrained_vgg16 = VGG16(weights='imagenet', include_top=True)
-    model = Model(inputs=pretrained_vgg16.input,
+    print ("To load headless pretrained model...")
+    print ("Input integers for which model to load. 1-Pretrained VGG16, 2-Pretrained ResNet50, 3-Resnet50")
+    n1=input("Enter numbers 1/2/3")
+    n=int(n1)
+    if n==1:
+        pretrained_vgg16 = VGG16(weights='imagenet', include_top=True)
+        model = Model(inputs=pretrained_vgg16.input,
                  outputs=pretrained_vgg16.get_layer('fc2').output)
-    '''
 
-    resn_model = ResNet50(weights='imagenet',include_top=True)
-    # x=resn_model.layers[-2].output
-    # x=Flatten()(x)
-    model=Model(inputs=resn_model.inputs, outputs=resn_model.layers[-2].output)
-    
-    # model = load_mrcnn_model()
-    # model = load_mrcnnlite_model()
+    if n==2:
+        Pretrained_resn_model = ResNet50(weights='imagenet',include_top=True)
+        model=Model(inputs=Pretrained_resn_model.inputs, outputs=resn_model.layers[-2].output)
+
+    if n==3:
+        model = load_mrcnnlite_model()
 
     return model
 

@@ -49,15 +49,7 @@ class MaskRCNNLite():
         # Stage 4
         x = self.conv_block(x, 3, [256, 256, 1024], stage=4, block='a', train_bn=train_bn)
         '''
-        block_count = {"resnet50": 5, "resnet101": 22}[architecture]
-        for i in range(block_count):
-            x = self.identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i), train_bn=train_bn)
-        C4 = x
-        # Stage 5
-        if stage5:
-            x = self.conv_block(x, 3, [512, 512, 2048], stage=5, block='a', train_bn=train_bn)
-            x = self.identity_block(x, 3, [512, 512, 2048], stage=5, block='b', train_bn=train_bn)
-            C5 = x = self.identity_block(x, 3, [512, 512, 2048], stage=5, block='c', train_bn=train_bn)
+    
        '''
         x = self.identity_block(x, 3, [256, 256, 1024], stage=4, block='b', train_bn=train_bn)
         x = self.identity_block(x, 3, [256, 256, 1024], stage=4, block='c', train_bn=train_bn)
@@ -165,7 +157,7 @@ class MaskRCNNLite():
         """
         import h5py
         # Conditional import to support versions of Keras before 2.2
-        # TODO: remove in about 6 months (end of 2018)
+        
         try:
             from keras.engine import saving
         except ImportError:
@@ -200,10 +192,6 @@ class MaskRCNNLite():
 
 
     def predict(self, inputs):
-      '''
-      ## TODO: proably need to use some code from detect in original maskrcnn to re-shape the 
-      ## inputs, currently going blind faith with default predict function of keras
-      '''
-      # self.detect(images, verbose=1)
+      
       self.keras_model.predict(inputs)
       return

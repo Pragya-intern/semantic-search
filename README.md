@@ -16,6 +16,41 @@
   import tensorflow as tf
   gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
   sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) 
+
+  ##Added changes to load_headless_pretrained_model() to load 3 kinds of models
+   print ("Input integers for which model to load. 1-Pretrained VGG16, 2-Pretrained ResNet50, 3-Resnet50")
+    n1=input("Enter numbers 1/2/3")
+    n=int(n1)
+    if n==1:
+        pretrained_vgg16 = VGG16(weights='imagenet', include_top=True)
+        model = Model(inputs=pretrained_vgg16.input,
+                 outputs=pretrained_vgg16.get_layer('fc2').output)
+
+    if n==2:
+        Pretrained_resn_model = ResNet50(weights='imagenet',include_top=True)
+        model=Model(inputs=Pretrained_resn_model.inputs, outputs=resn_model.layers[-2].output)
+
+    if n==3:
+        model = load_mrcnnlite_model()
+
+
+  ##load_mrcnnlite_model() loads the CNN used for classification in Mask R-CNN model
+  import vector_search.maskrcnnlite as modellib
+
+    MRCNN_ROOT = os.path.abspath("/home/intern/Documents/ai-ml-dl/external/MRCNN/Mask_RCNN")
+    MODEL_DIR = os.path.join(MRCNN_ROOT, "logs")
+    MRCNN_MODEL_PATH = os.path.join(MRCNN_ROOT, "mask_rcnn_coco.h5")
+    print("MRCNN_MODEL_PATH: {}".format(MRCNN_MODEL_PATH))
+    
+    
+
+    model = modellib.MaskRCNNLite(mode="inference", model_dir=MODEL_DIR)
+    model.load_weights(MRCNN_MODEL_PATH, by_name=True)
+    
+  ```
+  
+  ```
+  maskrcnnlite.py contains the coded architecture of the ResNet50 model we need for both Mask R-CNN and our Semantic Search 
   ```
 * For MASK_RCNN integrations
   * core mrcnn code, credits:
@@ -36,10 +71,7 @@
 * Put the custom dataset reference, on how to download
   - if possible give the script to download
   - instructions on where to store this dataset for demo
-* `search.py`
-  * `TODO: pass config parameter to select type of model: VGG/resnet/maskrcnn`
-* `vector_search/vector_search.py`
-  * make different model loding as config option
+
 
 ---
 # Semantic Search
